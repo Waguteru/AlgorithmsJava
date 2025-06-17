@@ -1,0 +1,560 @@
+Задание 28.
+import java.util.Scanner;
+
+public class CaesarCipher {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Ввод строки
+        String input = scanner.nextLine();
+
+        // Ввод числа сдвига
+        int shift = scanner.nextInt();
+        scanner.nextLine(); // чтобы считать оставшуюся строку после числа
+
+        // Ввод направления
+        String direction = scanner.nextLine().toLowerCase();
+
+        // Корректировка сдвига в зависимости от направления
+        if (direction.equals("влево")) {
+            shift = -shift;
+        } else if (!direction.equals("вправо")) {
+            System.out.println("Некорректное направление. Используйте 'влево' или 'вправо'.");
+            return;
+        }
+
+        // Шифрование
+        StringBuilder result = new StringBuilder();
+
+        for (char ch : input.toCharArray()) {
+            if (Character.isLetter(ch)) {
+                char base = Character.isUpperCase(ch) ? 'A' : 'a';
+                int offset = ch - base;
+                int newOffset = (offset + shift) % 26;
+                if (newOffset < 0) {
+                    newOffset += 26;
+                }
+                result.append((char) (base + newOffset));
+            } else {
+                // Не изменяем не буквенные символы
+                result.append(ch);
+            }
+        }
+
+        // Вывод зашифрованной строки
+        System.out.println(result.toString());
+    }
+}
+
+Задание 29.
+import java.util.Scanner;
+
+public class ConsecutiveSquares {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        int n = scanner.nextInt();
+
+        // Перебираем числа, чтобы найти такие, что (k+1)^2 - k^2 = n
+        // Раскроем скобки: (k^2 + 2k + 1) - k^2 = n => 2k + 1 = n
+        // Тогда k = (n - 1) / 2, если n нечётное
+        if (n % 2 == 1) {
+            int k = (n - 1) / 2;
+            int firstSquare = k * k;
+            int secondSquare = (k + 1) * (k + 1);
+            System.out.println(firstSquare + " " + secondSquare);
+        } else {
+            // Для чётных n, решение не существует в целых числах
+            System.out.println("Нет целых решений для данного n");
+        }
+    }
+}
+
+Задание 30.
+import java.util.Scanner;
+
+public class SumOfPowers {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+    System.out.print("Введите первое число: ");
+        int a = scanner.nextInt();
+        System.out.print("Введите второе число: ");
+        int s = scanner.nextInt();
+        int target = a * s;
+
+        // Проверяем, что сумма степеней цифр равна target
+        int sumPowers = 0;
+        String numberStr = String.valueOf(target);
+        for (int i = 0; i < numberStr.length(); i++) {
+            int digit = numberStr.charAt(i) - '0';
+            sumPowers += Math.pow(digit, i + 1);
+        }
+
+        if (sumPowers == target) {
+            System.out.println("Да");
+        } else {
+            System.out.println("Нет");
+        }
+    }
+}
+
+
+Задание 31.
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class TravelPlanner {
+
+    public static List<List<Integer>> findCityCombinations(List<Integer> distances, int numCities, int maxDistance) {
+        List<List<Integer>> combinations = new ArrayList<>();
+        findCombinationsRecursive(distances, numCities, 0, new ArrayList<>(), combinations, maxDistance);
+        return combinations;
+    }
+
+    private static void findCombinationsRecursive(List<Integer> distances, int numCities, int start, List<Integer> currentCombination, List<List<Integer>> combinations, int maxDistance) {
+        if (currentCombination.size() == numCities) {
+            int sum = currentCombination.stream().mapToInt(Integer::intValue).sum();
+            if (sum <= maxDistance) {
+                combinations.add(new ArrayList<>(currentCombination));
+            }
+            return;
+        }
+
+        for (int i = start; i < distances.size(); i++) {
+            currentCombination.add(distances.get(i));
+            findCombinationsRecursive(distances, numCities, i + 1, currentCombination, combinations, maxDistance);
+            currentCombination.remove(currentCombination.size() - 1);
+        }
+    }
+
+    public static void main(String[] args) {
+        List<Integer> distances = List.of(50, 55, 57, 58, 60);
+        int numCities = 3; 
+        int maxDistance = 163; 
+
+
+        List<List<Integer>> validCombinations = findCityCombinations(distances, numCities, maxDistance);
+
+        // Находим комбинацию с максимальной суммой, не превышающей maxDistance
+        List<Integer> bestCombination = null;
+        int maxSum = -1;
+
+        for (List<Integer> combination : validCombinations) {
+            int sum = combination.stream().mapToInt(Integer::intValue).sum();
+            if (sum > maxSum) {
+                maxSum = sum;
+                bestCombination = combination;
+            }
+        }
+        System.out.println("Наилучшая комбинация городов: " + bestCombination);
+        System.out.println("Суммарное расстояние: " + maxSum);
+    }
+}
+
+ Задание 32.
+
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
+
+public class FibonacciDigitAnalysis {
+
+    public static void main(String[] args) {
+        int i = 10; // изменить на любой в диапазоне от 10 до 100000
+
+        // Вычисление i-го числа Фибоначчи
+        BigInteger fibNumber = computeFibonacci(i);
+
+        // Подсчет вхождений цифр
+        Map<Character, Integer> digitCount = countDigits(fibNumber);
+
+        // Поиск цифры с максимальным количеством вхождений
+        int maxCount = -1;
+        int maxDigit = -1;
+        for (Map.Entry<Character, Integer> entry : digitCount.entrySet()) {
+            int digit = entry.getKey() - '0';
+            int count = entry.getValue();
+            if (count > maxCount || (count == maxCount && digit > maxDigit)) {
+                maxCount = count;
+                maxDigit = digit;
+            }
+        }
+
+        // Вывод результата
+        System.out.println("[" + maxDigit + ", " + maxCount + "]");
+    }
+
+    // Итеративный расчет i-го числа Фибоначчи
+    private static BigInteger computeFibonacci(int n) {
+        BigInteger a = BigInteger.ZERO;
+        BigInteger b = BigInteger.ONE;
+        for (int j = 2; j <= n; j++) {
+            BigInteger temp = a.add(b);
+            a = b;
+            b = temp;
+        }
+        return n == 0 ? BigInteger.ZERO : b;
+    }
+
+    // Подсчет вхождений цифр в число
+    private static Map<Character, Integer> countDigits(BigInteger number) {
+        Map<Character, Integer> countMap = new HashMap<>();
+        String numStr = number.toString();
+        for (char digit : numStr.toCharArray()) {
+            countMap.put(digit, countMap.getOrDefault(digit, 0) + 1);
+        }
+        return countMap;
+    }
+}
+
+
+Задание 33.
+
+import java.util.Scanner;
+
+public class Game {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.print("Введите количество палочек (1 <= n <= 10^18): ");
+        long n = scanner.nextLong();
+        
+        if (n < 1 || n > 1_000_000_000_000_000_000L) {
+            System.out.println("Неверное количество палочек. Пожалуйста, введите число от 1 до 10^18.");
+            return;
+        }
+
+        while (n > 0) {
+            System.out.println("Текущее количество палочек: " + n);
+            if (n % 2 == 0) {
+     
+                System.out.println("Вы можете взять 1 палочку или " + (n / 2) + " палочек.");
+   
+                n -= n / 2; 
+            } else {
+                
+                System.out.println("Можно взять 1 палочку.");
+                n -= 1; 
+            }
+        }
+
+        System.out.println("Палочек не осталось! Игра окончена.");
+        scanner.close();
+    }
+}
+
+
+Задание 34.
+
+import java.math.BigInteger;
+import java.util.Scanner;
+
+public class Game {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.print("Введите количество палочек: ");
+        long n = scanner.nextLong();
+
+       
+        long tanyaSticks = 0;
+        long sashaSticks = 0;
+
+       
+        boolean tanyaTurn = true;
+
+        while (n > 0) {
+            if (tanyaTurn) {
+               
+                if (n % 2 == 0) {
+                   
+                    tanyaSticks += 1;
+                    n -= 1; 
+                } else {
+                  
+                    tanyaSticks += 1;
+                    n -= 1;
+                }
+            } else {
+              
+                if (n % 2 == 0) {
+                  
+                    sashaSticks += n / 2;
+                    n /= 2; 
+                } else {
+   
+                    sashaSticks += 1;
+                    n -= 1;
+                }
+            }
+
+            tanyaTurn = !tanyaTurn;
+        }
+
+        System.out.println("Палочек у Тани: " + tanyaSticks);
+    }
+}
+
+Задание 35.
+
+import java.util.Arrays;
+import java.util.Comparator;
+
+public class WeightSorting {
+
+    // Функция для вычисления суммы цифр числа
+    public static int sumOfDigits(int number) {
+        int sum = 0;
+        String numStr = String.valueOf(number); // Преобразуем число в строку
+        for (int i = 0; i < numStr.length(); i++) {
+            sum += Character.getNumericValue(numStr.charAt(i)); // Получаем цифру из строки и добавляем к сумме
+        }
+        return sum;
+    }
+
+    public static void main(String[] args) {
+        String weights = "56 65 74 100 99 68 86 180 90";
+        String[] weightsArray = weights.split(" "); // Разбиваем строку на массив строк
+
+        Integer[] numbers = new Integer[weightsArray.length];
+        for (int i = 0; i < weightsArray.length; i++) {
+            numbers[i] = Integer.parseInt(weightsArray[i]);
+        }
+
+        Arrays.sort(numbers, Comparator.comparingInt(WeightSorting::sumOfDigits));
+
+        System.out.println(Arrays.toString(numbers));
+    }
+}
+
+
+Задание 36.
+import java.util.Scanner;
+public class caesar36 {
+    public static String decodeCaesar(String text, int shift) {
+        StringBuilder result = new StringBuilder();
+        shift = shift % 26;
+        for (char ch : text.toCharArray()) {
+            if (ch >= 'A' && ch <= 'Z') {
+                // Для заглавных букв
+                char decoded = (char) (ch - shift);
+                if (decoded < 'A') {
+                    decoded += 26;
+                }
+                result.append(decoded);
+            } else if (ch >= 'a' && ch <= 'z') {
+                // Для строчных букв
+                char decoded = (char) (ch - shift);
+                if (decoded < 'a') {
+                    decoded += 26;
+                }
+                result.append(decoded);
+            } else {
+                // Для остальных символов (пробелы, знаки препинания и т.д.) оставляем без изменений
+                result.append(ch);
+            }
+        }
+        return result.toString();
+    }
+
+    public static void main(String[] args) {
+        try (Scanner scanner = new Scanner(System.in)) {
+            System.out.println("Введите зашифрованный текст (до 10000 символов):");
+            String text = scanner.nextLine();
+            if (text.length() > 10000) {
+                System.out.println("Введённый текст превышает 10000 символов. Программа завершена.");
+                scanner.close();
+                return;
+            }
+            System.out.println("Введите сдвиг (число от 1 до 25) для расшифровки:");
+            int shift;
+            try {
+                shift = Integer.parseInt(scanner.nextLine());
+                if (shift < 1 || shift > 25) {
+                    System.out.println("Сдвиг должен быть в диапазоне от 1 до 25. Программа завершена.");
+                    scanner.close();
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Некорректный ввод сдвига. Программа завершена.");
+                scanner.close();
+                return;
+            }
+            String decodedText = decodeCaesar(text, shift);
+            System.out.println("Расшифрованный текст:");
+            System.out.println(decodedText);
+            }
+        }
+    }
+
+
+Задание 37
+
+import java.util.Random;
+import java.util.Scanner;
+
+public class CodeBreaker {
+    // The secret code to be guessed
+    private static final int CODE_LENGTH = 4;
+    private static final int MAX_ATTEMPTS = 20;
+    private static final Random random = new Random();
+    private static int[] secretCode;
+
+    public static void main(String[] args) {
+        // Generate a random secret code
+        secretCode = generateSecretCode();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Добро пожаловать в игру «Взломщик кодов»!");
+        System.out.println("У тебя " + MAX_ATTEMPTS + " попыток угадать 4-значный код.");
+
+        for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+            System.out.print("Попытка " + attempt + ": Введи 4 числа (0-9) разделенные Enter: ");
+            int[] guess = new int[CODE_LENGTH];
+
+            // Read user input
+            for (int i = 0; i < CODE_LENGTH; i++) {
+                guess[i] = scanner.nextInt();
+            }
+
+            // Check for matches
+            int matches = checkMatches(guess);
+            System.out.println("У тебя " + matches + " совпадений.");
+
+            // Check if the guess is correct
+            if (matches == CODE_LENGTH) {
+                System.out.println("Поздравляем! Вы угадали код!");
+                break;
+            }
+        }
+
+        System.out.println("Секретный код был: " + arrayToString(secretCode));
+        scanner.close();
+    }
+
+    // Generate a random 4-digit code
+    private static int[] generateSecretCode() {
+        int[] code = new int[CODE_LENGTH];
+        for (int i = 0; i < CODE_LENGTH; i++) {
+            code[i] = random.nextInt(10); // Numbers from 0 to 9
+        }
+        return code;
+    }
+
+    // Check how many numbers match between the guess and the secret code
+    private static int checkMatches(int[] guess) {
+        int matchCount = 0;
+        for (int i = 0; i < CODE_LENGTH; i++) {
+            if (guess[i] == secretCode[i]) {
+                matchCount++;
+            }
+        }
+        return matchCount;
+    }
+
+    // Utility method to convert array to string for display
+    private static String arrayToString(int[] array) {
+        StringBuilder sb = new StringBuilder();
+        for (int num : array) {
+            sb.append(num).append(" ");
+        }
+        return sb.toString().trim();
+    }
+}
+
+Задание 38.
+import java.util.*;
+
+public class task38 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Ввод количества игроков
+        System.out.print("Введите количество игроков: ");
+        int n = scanner.nextInt();
+
+        // Ввод номера игрока, с которого начинается игра (1-based)
+        System.out.print("Введите номер игрока, с которого начинается игра: ");
+        int start = scanner.nextInt();
+
+        // Инициализация списка игроков от 1 до n
+        List<Integer> players = new ArrayList<>();
+        for (int i = 1; i <= n; i++) {
+            players.add(i);
+        }
+
+        // Индекс начала игры (0-based)
+        int index = start - 1;
+
+        // Список выбывших игроков в порядке выбывания
+        List<Integer> eliminated = new ArrayList<>();
+
+        // Играем пока не останется 1 игрок
+        while (players.size() > 1) {
+            // Каждый третий выбывает: считаем 3 шага включая текущий
+            // Т.к. текущий индекс - старт, то считаем 2 шага вперед:
+            index = (index + 2) % players.size();
+
+            int removed = players.remove(index);
+            eliminated.add(removed);
+
+            // Вывод текущего состояния
+            System.out.println("Выбыли: " + eliminated);
+            System.out.println("Остались: " + players);
+            System.out.println("-----");
+            // index указывает на следующий игрок после удаленного, так что не меняем
+        }
+
+        // Добавляем победителя в список выбывших (в конце)
+        eliminated.add(players.get(0));
+
+        System.out.println("Победитель: " + players.get(0));
+        System.out.println("Полный список выбывших (включая победителя): " + eliminated);
+    }
+}
+
+
+
+
+Задание 39.
+import java.util.Scanner;
+
+public class task39 {
+    public static void main(String[] args) {
+       
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Введите текст:");
+        String input = scanner.nextLine(); 
+        
+       
+        String transformedText = transformText(input);
+    
+        System.out.println(transformedText);
+    }
+
+
+    private static String transformText(String text) {
+      
+        String[] words = text.split(" ");
+        StringBuilder result = new StringBuilder();
+
+       
+        for (String word : words) {
+          
+            if (word.length() > 0 && Character.isLetter(word.charAt(0))) {
+               
+                String transformedWord = word.substring(1) + word.charAt(0) + "ауч";
+                result.append(transformedWord).append(" "); 
+            } else {
+               
+                result.append(word).append(" ");
+            }
+        }
+
+       
+        return result.toString().trim();
+    }
+}
